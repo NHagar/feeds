@@ -7,6 +7,7 @@ interface Feed {
   feed_title: string;
   feed_url: string;
   website_url: string;
+  favicon_url?: string; // Add favicon URL field
 }
 
 // Define interface for Papa Parse results
@@ -22,6 +23,22 @@ const FeedDirectory = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Generate a favicon URL from a website URL
+  const getFaviconUrl = (websiteUrl: string): string => {
+    try {
+      // Use Google's favicon service
+      if (websiteUrl) {
+        // Extract the domain from the URL
+        const url = new URL(websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`);
+        return `https://www.google.com/s2/favicons?domain=${url.hostname}`;
+      }
+    } catch (e) {
+      console.error("Error generating favicon URL:", e);
+    }
+    // Return a default favicon if we can't generate one
+    return '/default-favicon.png';
+  };
+
   useEffect(() => {
     const loadFeeds = async () => {
       try {
@@ -36,12 +53,16 @@ const FeedDirectory = () => {
           header: true,
           skipEmptyLines: true,
           complete: (results: PapaParseResult) => {
-            const sanitizedFeeds = results.data.map((feed: Record<string, string>, index: number) => ({
-              id: feed.feed_url || `feed-${index}`,
-              feed_title: feed.feed_title || 'Untitled Feed',
-              feed_url: feed.feed_url || '',
-              website_url: feed.website_url || ''
-            })).filter((feed: Feed) => feed.feed_url);
+            const sanitizedFeeds = results.data.map((feed: Record<string, string>, index: number) => {
+              const websiteUrl = feed.website_url || '';
+              return {
+                id: feed.feed_url || `feed-${index}`,
+                feed_title: feed.feed_title || 'Untitled Feed',
+                feed_url: feed.feed_url || '',
+                website_url: websiteUrl,
+                favicon_url: getFaviconUrl(websiteUrl)
+              };
+            }).filter((feed: Feed) => feed.feed_url);
 
             setFeeds(sanitizedFeeds);
             setLoading(false);
@@ -118,7 +139,16 @@ const FeedDirectory = () => {
               className="p-4 md:p-5 hover:bg-gray-50 transition-colors duration-150 border-l-4 border-transparent hover:border-purple-600 border-b border-gray-200 group"
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-3 sm:gap-4 min-w-0">
-                <h2 className="text-lg font-semibold text-gray-800 group-hover:text-purple-800 transition-colors whitespace-nowrap overflow-hidden text-ellipsis min-w-0 flex-grow mr-4">
+                <h2 className="text-lg font-semibold text-gray-800 group-hover:text-purple-800 transition-colors whitespace-nowrap overflow-hidden text-ellipsis min-w-0 flex-grow mr-4 flex items-center">
+                  <img
+                    src={feed.favicon_url}
+                    alt=""
+                    className="w-4 h-4 mr-2 flex-shrink-0"
+                    onError={(e) => {
+                      // Fallback if favicon fails to load
+                      (e.target as HTMLImageElement).src = '/default-favicon.png';
+                    }}
+                  />
                   {feed.feed_title}
                 </h2>
 
