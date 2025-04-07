@@ -36,14 +36,14 @@ const FeedDirectory = () => {
       console.error("Error generating favicon URL:", e);
     }
     // Return a default favicon if we can't generate one
-    return '/default-favicon.png';
+    return `${import.meta.env.BASE_URL}default-favicon.png`;
   };
 
   useEffect(() => {
     const loadFeeds = async () => {
       try {
         let fileData;
-        const response = await fetch('/feeds_deduped.csv'); // Adjust path if needed relative to public folder
+        const response = await fetch(`${import.meta.env.BASE_URL}feeds_deduped.csv`); // Use BASE_URL to get the correct path
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -146,7 +146,7 @@ const FeedDirectory = () => {
                     className="w-4 h-4 mr-2 flex-shrink-0"
                     onError={(e) => {
                       // Fallback if favicon fails to load
-                      (e.target as HTMLImageElement).src = '/default-favicon.png';
+                      (e.target as HTMLImageElement).src = `${import.meta.env.BASE_URL}default-favicon.png`;
                     }}
                   />
                   {feed.feed_title}
