@@ -113,7 +113,7 @@ const FeedDirectory = () => {
     <div className="bg-white shadow-lg rounded-lg overflow-hidden max-w-4xl mx-auto my-8">
       <div className="p-6 bg-gradient-to-r from-purple-700 to-purple-900">
         <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Local News + AI Feed Directory</h1>
-        <p className="text-purple-100 mt-2 text-base md:text-lg font-medium">Browse and subscribe to {feeds.length} curated feeds</p>
+        <p className="text-purple-100 mt-2 text-base md:text-lg font-medium">Browse and subscribe to {feeds.length} feeds, curated by JOUR 390 students!</p>
 
         <div className="mt-4">
           <input
